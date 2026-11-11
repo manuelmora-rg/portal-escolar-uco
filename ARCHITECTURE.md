@@ -404,6 +404,8 @@ Convenciones:
 
 ### 6.1 Mapa de endpoints (resumen)
 
+Esta es la lista de endpoints **implementados y verificados** en el MVP.
+
 **Público** (`/public`, sin autenticación, solo contenido publicado)
 
 ```text
@@ -413,8 +415,7 @@ GET  /public/news?page&size         # noticias publicadas
 GET  /public/news/{slug}
 GET  /public/events?from&to         # calendario publicado
 GET  /public/gallery                # álbumes publicados
-GET  /public/gallery/{albumId}
-POST /public/contact                # formulario de contacto (rate limited)
+POST /public/contact                # formulario de contacto
 ```
 
 **Autenticación**
@@ -430,96 +431,95 @@ POST /auth/change-password
 **Estudiante** (`/student`, rol `STUDENT`)
 
 ```text
+GET  /student/profile
 GET  /student/dashboard
+GET  /student/periods
 GET  /student/grades?periodId
 GET  /student/schedule
-GET  /student/assignments?status
-GET  /student/assignments/{id}
-POST /student/assignments/{id}/submissions
-GET  /student/submissions
+GET  /student/assignments
+POST /student/assignments/{assignmentId}/submit
 GET  /student/materials
 GET  /student/attendance?from&to
 GET  /student/observations
 GET  /student/notifications
-PATCH /student/notifications/{id}/read
+PATCH /student/notifications/{notificationId}/read
 ```
 
 **Docente** (`/teacher`, rol `TEACHER`)
 
 ```text
 GET  /teacher/dashboard
+GET  /teacher/periods
 GET  /teacher/courses
+GET  /teacher/course-subjects
 GET  /teacher/courses/{courseId}/students
-GET  /teacher/course-subjects/{id}
-GET  /teacher/course-subjects/{id}/grades
-POST /teacher/course-subjects/{id}/grades
+GET  /teacher/course-subjects/{courseSubjectId}/gradebook
+POST /teacher/course-subjects/{courseSubjectId}/grades
 PUT  /teacher/grades/{gradeId}
-POST /teacher/grades/{gradeId}/void
-POST /teacher/course-subjects/{id}/assignments
-PUT  /teacher/assignments/{id}
-GET  /teacher/assignments/{id}/submissions
-PUT  /teacher/submissions/{id}/grade
-POST /teacher/course-subjects/{id}/attendance
-GET  /teacher/course-subjects/{id}/attendance
+GET  /teacher/course-subjects/{courseSubjectId}/attendance
+POST /teacher/course-subjects/{courseSubjectId}/attendance
+GET  /teacher/assignments
+POST /teacher/course-subjects/{courseSubjectId}/assignments
+GET  /teacher/assignments/{assignmentId}/submissions
+PUT  /teacher/submissions/{submissionId}/grade
+GET  /teacher/observations
 POST /teacher/observations
-POST /teacher/course-subjects/{id}/materials
-PUT  /teacher/materials/{id}
+GET  /teacher/materials
+POST /teacher/course-subjects/{courseSubjectId}/materials
+GET  /teacher/notifications
+PATCH /teacher/notifications/{notificationId}/read
 ```
 
 **Padre** (`/parent`, rol `PARENT`)
 
 ```text
 GET  /parent/dashboard
+GET  /parent/periods
 GET  /parent/children
-GET  /parent/children/{studentId}/summary
+GET  /parent/children/{studentId}/overview
 GET  /parent/children/{studentId}/grades?periodId
+GET  /parent/children/{studentId}/schedule
+GET  /parent/children/{studentId}/assignments
 GET  /parent/children/{studentId}/attendance?from&to
 GET  /parent/children/{studentId}/observations
-GET  /parent/children/{studentId}/assignments
-GET  /parent/comunicados
 GET  /parent/meetings
-PATCH /parent/meetings/{id}/confirmation
+POST /parent/meetings/{meetingId}/confirm
+GET  /parent/notifications
+PATCH /parent/notifications/{notificationId}/read
 ```
 
 **Administración** (`/admin`, rol `ADMIN`)
 
 ```text
-# Personas
-GET/POST/PUT/PATCH /admin/students
-GET/POST/PUT/PATCH /admin/teachers
-GET/POST/PUT/PATCH /admin/parents
-POST /admin/parents/{id}/children
-DELETE /admin/parents/{parentId}/children/{studentId}
-GET/POST/PUT /admin/users
-PATCH /admin/users/{id}/status
-POST /admin/users/{id}/reset-password
-
-# Estructura académica
-GET/POST/PUT /admin/academic-years
-GET/POST/PUT /admin/periods
-GET/POST/PUT /admin/grade-levels
-GET/POST/PUT /admin/subjects
-GET/POST/PUT /admin/courses
-GET/POST/PUT /admin/course-subjects
-GET/POST/PUT /admin/schedules
-GET/POST/PUT /admin/enrollments
-
-# Contenido y comunicación
-GET/POST/PUT /admin/news
-GET/POST/PUT /admin/events
-GET/POST/PUT /admin/gallery
-GET/POST/PUT /admin/meetings
-POST /admin/notifications
-
-# Reportes y configuración
-GET  /admin/reports/enrollment
-GET  /admin/reports/grades
-GET  /admin/reports/attendance
-GET/PUT /admin/settings
-GET  /admin/audit-logs
+GET  /admin/dashboard
+GET  /admin/students
+GET  /admin/teachers
+GET  /admin/parents
+GET  /admin/courses
+GET  /admin/subjects
+GET  /admin/enrollments
+GET  /admin/news
+POST /admin/news
+PUT  /admin/news/{newsId}
+PATCH /admin/news/{newsId}/publish
+GET  /admin/contact-messages
+PATCH /admin/contact-messages/{messageId}/status
+GET  /admin/settings/institution
+PUT  /admin/settings/institution
+POST /admin/parent-links
+GET  /admin/notifications
+PATCH /admin/notifications/{notificationId}/read
 ```
 
-Los endpoints exactos se ajustarán durante la implementación y se documentarán con OpenAPI.
+**SPA y archivos estáticos**
+
+- `GET /` y las rutas del navegador (`/institucion`, `/noticias`, `/login`, `/app/**`, etc.)
+  devuelven `index.html`.
+- Cualquier ruta sin extensión que no empiece por `/api/` ni `/actuator/` también devuelve
+  `index.html` (fallback de React Router).
+- `/api/**` sigue protegido por Spring Security; el resto de rutas se permite a nivel HTTP y
+  la autorización real de datos ocurre en los endpoints de API.
+- Un recurso inexistente devuelve `404` (no `500`).
 
 ---
 
@@ -796,6 +796,14 @@ mvnw package   →  portal-escolar.jar  →  java -jar
 ```
 
 Spring Boot sirve el SPA y redirige rutas desconocidas a `index.html`. Un solo origen evita CORS.
+
+Política HTTP implementada:
+
+- `/api/**` requiere autenticación (salvo `/api/v1/auth/**` y `/api/v1/public/**`).
+- `/`, las rutas conocidas del navegador y cualquier ruta sin extensión devuelven `index.html`.
+- Los archivos estáticos (`/assets/**`, `/images/**`, `/favicon.svg`) son públicos.
+- El resto de rutas no-API se permite a nivel HTTP; la autorización de datos se aplica en la API.
+- `NoResourceFoundException` se traduce a `404` en lugar de `500`.
 
 ### 11.3 Archivos subidos
 
