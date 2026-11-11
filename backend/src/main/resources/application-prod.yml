@@ -1,0 +1,24 @@
+spring:
+  flyway:
+    clean-disabled: true
+
+app:
+  jwt:
+    cookie-secure: true
+
+server:
+  forward-headers-strategy: framework
+
+logging:
+  level:
+    root: WARN
+    com.portal.escolar: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
