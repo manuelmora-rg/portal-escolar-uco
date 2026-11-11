@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Vida institucional">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b2545"/>
+      <stop offset="1" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <circle cx="240" cy="180" r="120" fill="#38bdf8" opacity="0.25"/>
+  <circle cx="940" cy="560" r="200" fill="#7dd3fc" opacity="0.15"/>
+  <g fill="#e0f2fe" opacity="0.9">
+    <circle cx="430" cy="360" r="34"/>
+    <path d="M385 470 c0 -34 20 -56 45 -56 s45 22 45 56 z"/>
+    <circle cx="600" cy="330" r="42"/>
+    <path d="M545 460 c0 -40 24 -66 55 -66 s55 26 55 66 z"/>
+    <circle cx="770" cy="360" r="34"/>
+    <path d="M725 470 c0 -34 20 -56 45 -56 s45 22 45 56 z"/>
+  </g>
+  <text x="120" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="600" fill="#7dd3fc" letter-spacing="3">GALERÍA INSTITUCIONAL</text>
+  <text x="120" y="665" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="800" fill="#ffffff">Vida institucional</text>
+</svg>
