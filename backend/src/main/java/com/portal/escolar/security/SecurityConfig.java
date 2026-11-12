@@ -55,7 +55,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/public/**").permitAll()
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout",
+                                "/api/v1/auth/accept-invitation", "/api/v1/auth/invitations/**").permitAll()
                         .requestMatchers("/actuator/health", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/", "/index.html", "/favicon.ico", "/favicon.svg", "/icons.svg",
@@ -63,7 +64,7 @@ public class SecurityConfig {
                                 "/institucion", "/oferta-academica", "/noticias/**", "/galeria/**",
                                 "/calendario", "/contacto", "/login", "/app/**").permitAll()
                         .requestMatchers(request -> {
-                            String path = request.getServletPath();
+                            String path = request.getRequestURI();
                             return !path.startsWith("/api/") && !path.startsWith("/actuator/");
                         }).permitAll()
                         .anyRequest().authenticated())

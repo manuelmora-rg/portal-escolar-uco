@@ -10,15 +10,29 @@ import com.portal.escolar.dto.AdminDtos.AdminNewsDto;
 import com.portal.escolar.dto.AdminDtos.AdminParentDto;
 import com.portal.escolar.dto.AdminDtos.AdminStudentDto;
 import com.portal.escolar.dto.AdminDtos.AdminTeacherDto;
+import com.portal.escolar.dto.AdminDtos.AdminUserDto;
+import com.portal.escolar.dto.AdminDtos.AuditLogDto;
 import com.portal.escolar.dto.AdminDtos.ContactMessageDto;
 import com.portal.escolar.dto.AdminDtos.ContactStatusRequest;
+import com.portal.escolar.dto.AdminDtos.CreateUserRequest;
+import com.portal.escolar.dto.AdminDtos.CreatedUserDto;
+import com.portal.escolar.dto.AdminDtos.InvitationCreatedDto;
+import com.portal.escolar.dto.AdminDtos.InvitationDto;
+import com.portal.escolar.dto.AdminDtos.InvitationRequest;
 import com.portal.escolar.dto.AdminDtos.NewsRequest;
 import com.portal.escolar.dto.AdminDtos.ParentLinkRequest;
+import com.portal.escolar.dto.AdminDtos.PasswordResetDto;
+import com.portal.escolar.dto.AdminDtos.ResetPasswordRequest;
+import com.portal.escolar.dto.AdminDtos.UpdateUserRequest;
+import com.portal.escolar.dto.AdminDtos.UserStatusRequest;
 import com.portal.escolar.security.CurrentUser;
 import com.portal.escolar.services.AdminService;
+import com.portal.escolar.services.AuditService;
+import com.portal.escolar.services.IdentityAdminService;
 import com.portal.escolar.services.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +42,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -41,6 +56,8 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
+    private final IdentityAdminService identityAdminService;
+    private final AuditService auditService;
     private final NotificationService notificationService;
 
     @GetMapping("/dashboard")
@@ -61,6 +78,62 @@ public class AdminController {
     @GetMapping("/parents")
     public ResponseEntity<List<AdminParentDto>> parents() {
         return ResponseEntity.ok(adminService.parents());
+    }
+
+    // ===== Gestión de usuarios =====
+
+    @GetMapping("/users")
+    public ResponseEntity<List<AdminUserDto>> users() {
+        return ResponseEntity.ok(identityAdminService.listUsers());
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<AdminUserDto> user(@PathVariable UUID userId) {
+        return ResponseEntity.ok(identityAdminService.getUser(userId));
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<CreatedUserDto> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(identityAdminService.createUser(CurrentUser.require(), request));
+    }
+
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<AdminUserDto> updateUser(@PathVariable UUID userId,
+                                                   @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(identityAdminService.updateUser(CurrentUser.require(), userId, request));
+    }
+
+    @PatchMapping("/users/{userId}/status")
+    public ResponseEntity<AdminUserDto> updateUserStatus(@PathVariable UUID userId,
+                                                         @RequestBody UserStatusRequest request) {
+        return ResponseEntity.ok(identityAdminService.setStatus(CurrentUser.require(), userId, request.enabled()));
+    }
+
+    @PostMapping("/users/{userId}/reset-password")
+    public ResponseEntity<PasswordResetDto> resetPassword(@PathVariable UUID userId,
+                                                          @Valid @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(identityAdminService.resetPassword(CurrentUser.require(), userId, request));
+    }
+
+    // ===== Invitaciones =====
+
+    @GetMapping("/invitations")
+    public ResponseEntity<List<InvitationDto>> invitations() {
+        return ResponseEntity.ok(identityAdminService.listInvitations());
+    }
+
+    @PostMapping("/invitations")
+    public ResponseEntity<InvitationCreatedDto> createInvitation(@Valid @RequestBody InvitationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(identityAdminService.createInvitation(CurrentUser.require(), request));
+    }
+
+    // ===== Auditoría =====
+
+    @GetMapping("/audit-logs")
+    public ResponseEntity<List<AuditLogDto>> auditLogs(@RequestParam(defaultValue = "100") int limit) {
+        return ResponseEntity.ok(auditService.list(limit));
     }
 
     @GetMapping("/courses")
@@ -96,7 +169,7 @@ public class AdminController {
 
     @PatchMapping("/news/{newsId}/publish")
     public ResponseEntity<AdminNewsDto> publishNews(@PathVariable UUID newsId) {
-        return ResponseEntity.ok(adminService.publishNews(newsId));
+        return ResponseEntity.ok(adminService.publishNews(CurrentUser.require(), newsId));
     }
 
     @GetMapping("/contact-messages")
@@ -107,7 +180,7 @@ public class AdminController {
     @PatchMapping("/contact-messages/{messageId}/status")
     public ResponseEntity<ContactMessageDto> updateContactStatus(@PathVariable UUID messageId,
                                                                  @Valid @RequestBody ContactStatusRequest request) {
-        return ResponseEntity.ok(adminService.updateContactStatus(messageId, request));
+        return ResponseEntity.ok(adminService.updateContactStatus(CurrentUser.require(), messageId, request));
     }
 
     @GetMapping("/settings/institution")
@@ -117,12 +190,12 @@ public class AdminController {
 
     @PutMapping("/settings/institution")
     public ResponseEntity<PublicInstitutionDto> updateInstitution(@RequestBody Map<String, Object> values) {
-        return ResponseEntity.ok(adminService.updateInstitution(values));
+        return ResponseEntity.ok(adminService.updateInstitution(CurrentUser.require(), values));
     }
 
     @PostMapping("/parent-links")
     public ResponseEntity<Map<String, String>> linkParent(@Valid @RequestBody ParentLinkRequest request) {
-        adminService.linkParent(request);
+        adminService.linkParent(CurrentUser.require(), request);
         return ResponseEntity.ok(Map.of("message", "Vínculo familiar registrado"));
     }
 

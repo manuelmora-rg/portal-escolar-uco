@@ -1,0 +1,33 @@
+# Perfil de pruebas automatizadas.
+# Usa una base de datos independiente para no mezclar datos con desarrollo.
+# El perfil `test` también carga los datos ficticios (DemoDataInitializer).
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/portal_escolar_test}
+    username: ${TEST_DB_USERNAME:portal_app}
+    password: ${TEST_DB_PASSWORD:portal_app_dev_2026}
+    hikari:
+      maximum-pool-size: 4
+      connection-timeout: 10000
+  jpa:
+    show-sql: false
+  flyway:
+    clean-disabled: true
+
+app:
+  demo:
+    enabled: true
+    password: ${APP_DEMO_PASSWORD:Portal2026*}
+  jwt:
+    # Secreto exclusivo para pruebas locales; nunca se usa en producción.
+    secret: test-only-secret-0123456789abcdef0123456789abcdef0123456789abcdef
+    access-token-minutes: 15
+    refresh-token-days: 7
+    cookie-secure: false
+
+logging:
+  level:
+    root: WARN
+    com.portal.escolar: INFO
+    org.springframework.security: WARN
+    org.flywaydb: WARN

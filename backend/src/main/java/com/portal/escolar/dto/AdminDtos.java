@@ -121,6 +121,137 @@ public final class AdminDtos {
     ) {
     }
 
+    // ===== Gestión de usuarios =====
+
+    public record AdminUserDto(
+            UUID id,
+            String firstName,
+            String lastName,
+            String fullName,
+            String email,
+            String role,
+            boolean enabled,
+            boolean mustChangePassword,
+            Instant lastLoginAt,
+            Instant createdAt
+    ) {
+    }
+
+    public record CreateUserRequest(
+            @NotBlank(message = "El nombre es obligatorio")
+            @Size(max = 80)
+            String firstName,
+
+            @NotBlank(message = "El apellido es obligatorio")
+            @Size(max = 80)
+            String lastName,
+
+            @NotBlank(message = "El correo es obligatorio")
+            @Email(message = "El correo no es válido")
+            @Size(max = 160)
+            String email,
+
+            @NotBlank(message = "El rol es obligatorio")
+            String role,
+
+            @Size(max = 40)
+            String documentNumber,
+
+            @Size(max = 30)
+            String phone,
+
+            @Size(max = 30)
+            String employeeCode,
+
+            @Size(max = 120)
+            String specialty,
+
+            @Size(min = 10, max = 72, message = "La contraseña temporal debe tener entre 10 y 72 caracteres")
+            String temporaryPassword
+    ) {
+    }
+
+    public record CreatedUserDto(AdminUserDto user, String temporaryPassword) {
+    }
+
+    public record UpdateUserRequest(
+            @NotBlank(message = "El nombre es obligatorio")
+            @Size(max = 80)
+            String firstName,
+
+            @NotBlank(message = "El apellido es obligatorio")
+            @Size(max = 80)
+            String lastName,
+
+            @NotBlank(message = "El correo es obligatorio")
+            @Email(message = "El correo no es válido")
+            @Size(max = 160)
+            String email
+    ) {
+    }
+
+    public record UserStatusRequest(boolean enabled) {
+    }
+
+    public record ResetPasswordRequest(
+            @Size(min = 10, max = 72, message = "La contraseña temporal debe tener entre 10 y 72 caracteres")
+            String temporaryPassword
+    ) {
+    }
+
+    public record PasswordResetDto(String temporaryPassword) {
+    }
+
+    // ===== Invitaciones =====
+
+    public record InvitationRequest(
+            @NotBlank(message = "El correo es obligatorio")
+            @Email(message = "El correo no es válido")
+            @Size(max = 160)
+            String email,
+
+            @NotBlank(message = "El rol es obligatorio")
+            String role
+    ) {
+    }
+
+    public record InvitationDto(
+            UUID id,
+            String email,
+            String role,
+            Instant expiresAt,
+            Instant usedAt,
+            Instant revokedAt,
+            Instant createdAt,
+            String createdByName
+    ) {
+    }
+
+    public record InvitationCreatedDto(InvitationDto invitation, String token) {
+    }
+
+    public record InvitationInfoDto(
+            String email,
+            String role,
+            Instant expiresAt,
+            boolean valid
+    ) {
+    }
+
+    // ===== Auditoría =====
+
+    public record AuditLogDto(
+            UUID id,
+            String actorName,
+            String action,
+            String entity,
+            String entityId,
+            String details,
+            String ip,
+            Instant createdAt
+    ) {
+    }
+
     private AdminDtos() {
     }
 }

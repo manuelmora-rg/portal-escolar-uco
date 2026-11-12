@@ -5,7 +5,8 @@ sitio público, gestión académica y paneles privados para estudiantes, docente
 y administradores.
 
 > **Estado actual:** MVP implementado y verificado de extremo a extremo (backend + frontend,
-> cuatro roles, sitio público y paneles privados). Ver "Estado de implementación" más abajo.
+> cuatro roles, sitio público y paneles privados), con gestión de identidad por invitación,
+> auditoría general y suite de integración JUnit (22/22). Ver "Estado de implementación" más abajo.
 >
 > **Nombre del colegio:** pendiente de definir. Se usa "Portal Escolar" como nombre provisional.
 > La identidad visual (escudo, colores, tipografía) está preparada para personalizarse.
@@ -135,9 +136,17 @@ Contraseña para todas las cuentas demo: `Portal2026*` (solo perfil `dev`).
 ### Pruebas
 
 ```powershell
-# Prueba de humo de la API (39 casos: login, roles, aislamiento 403, CRUD principal)
+# Suite de integración backend (22 pruebas; usa portal_escolar_test)
+cd backend
+.\mvnw.cmd test
+
+# Prueba de humo de la API contra el backend en ejecución (39 casos)
 .\scripts\test-api.ps1
 ```
+
+La suite JUnit cubre autenticación y refresh rotativo, autorización por rol, gestión de usuarios,
+invitaciones de un solo uso, restablecimiento de contraseña, auditoría, aislamiento padre-hijo
+(IDOR) y el flujo académico completo (notas, asistencia, tareas y entregas).
 
 ---
 
@@ -151,6 +160,7 @@ portal-escolar/
 ├─ scripts/                  # Utilidades locales (entorno, base de datos)
 ├─ README.md
 ├─ ARCHITECTURE.md
+├─ API_DOCUMENTATION.md
 ├─ PLAN.md
 ├─ CHANGELOG.md
 └─ .gitignore
@@ -178,25 +188,28 @@ de seguridad.
 
 | Área | Estado | Detalle |
 |------|--------|---------|
-| Base de datos | ✅ | 31 tablas en el esquema `portal`, migraciones Flyway `V1`–`V3`, datos demo en `dev`. |
+| Base de datos | ✅ | 32 tablas en el esquema `portal` (31 + `invitation`), migraciones Flyway `V1`–`V4`, datos demo en `dev`. |
 | Seguridad | ✅ | JWT de acceso + refresh rotativo en cookie HttpOnly, BCrypt 12, rate limit de login, autorización por rol y por recurso. |
+| Identidad | ✅ | Cuentas creadas por invitación del administrador (sin registro público), invitaciones de un solo uso con token hasheado, activación/desactivación, restablecimiento de contraseña y rol inmutable. |
 | API pública | ✅ | Institución, oferta académica, noticias, eventos, galería y contacto. |
 | Panel estudiante | ✅ | Inicio, calificaciones, horario, tareas con entrega, materiales, asistencia, observaciones, notificaciones. |
 | Panel docente | ✅ | Inicio, cursos, libro de notas (crear/editar), asistencia por lote, tareas y calificación de entregas, observaciones, materiales. |
 | Panel de padres | ✅ | Hijos autorizados, resumen, calificaciones por periodo, horario, tareas, asistencia, observaciones, reuniones. |
-| Panel admin | ✅ | Inicio, estudiantes, docentes, padres y vínculos, cursos, materias, matrículas, noticias (CRUD/publicación), mensajes, configuración institucional. |
-| Auditoría | ✅ | Cambios de calificaciones registrados con usuario, valor anterior y nuevo. |
+| Panel admin | ✅ | Inicio, usuarios, invitaciones, estudiantes, docentes, padres y vínculos, cursos, materias, matrículas, noticias (CRUD/publicación), mensajes, configuración institucional y auditoría. |
+| Auditoría | ✅ | Registro general en `audit_log` (usuarios, invitaciones, noticias, mensajes, configuración y vínculos) y auditoría de cambios de calificaciones. |
+| Pruebas backend | ✅ | 22 pruebas JUnit de integración sobre `portal_escolar_test`: autenticación, roles, IDOR, usuarios, invitaciones, auditoría y flujo académico. |
 | SPA servida por Spring Boot | ✅ | Build de Vite copiado a `static`, fallback a `index.html`, recursos estáticos públicos. |
-| Verificación | ✅ | `scripts/test-api.ps1` (39/39), compilación backend, build frontend y render de 33 rutas con Chrome headless sin errores de consola. |
+| Verificación | ✅ | `mvnw test` (22/22), `scripts/test-api.ps1` (39/39), compilación backend, build frontend y render de 33 rutas con Chrome headless sin errores de consola. |
 
-Pendiente para producción: nombre/identidad definitiva del colegio, pruebas automatizadas
-unitarias formales (JUnit/Vitest), revisión de accesibilidad y respaldos. Ver `PLAN.md`.
+Pendiente para producción: nombre/identidad definitiva del colegio, suite frontend (Vitest +
+Testing Library), revisión de accesibilidad, respaldos y monitoreo. Ver `PLAN.md`.
 
 ---
 
 ## 7. Documentación
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md): arquitectura, modelo de datos, permisos, API y mapa del sitio.
+- [`API_DOCUMENTATION.md`](./API_DOCUMENTATION.md): referencia completa de endpoints, contratos y ejemplos.
 - [`PLAN.md`](./PLAN.md): fases, tareas y decisiones pendientes.
 - [`CHANGELOG.md`](./CHANGELOG.md): historial de cambios.
 

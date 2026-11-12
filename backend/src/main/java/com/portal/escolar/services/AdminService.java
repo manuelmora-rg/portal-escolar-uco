@@ -73,6 +73,7 @@ public class AdminService {
     private final ContactMessageRepository contactMessageRepository;
     private final SettingsService settingsService;
     private final LookupService lookup;
+    private final AuditService auditService;
     private final ObjectMapper objectMapper;
 
     public DashboardAdminDto dashboard() {
@@ -206,6 +207,8 @@ public class AdminService {
         news.setSlug(uniqueSlug(request.title(), null));
         applyNews(news, request, principal);
         newsRepository.save(news);
+        auditService.record(principal, "NEWS_CREATED", "news", news.getId().toString(),
+                Map.of("title", news.getTitle(), "status", news.getStatus().name()));
         return toNewsDto(news);
     }
 
@@ -218,11 +221,13 @@ public class AdminService {
         }
         applyNews(news, request, principal);
         newsRepository.save(news);
+        auditService.record(principal, "NEWS_UPDATED", "news", news.getId().toString(),
+                Map.of("title", news.getTitle(), "status", news.getStatus().name()));
         return toNewsDto(news);
     }
 
     @Transactional
-    public AdminNewsDto publishNews(UUID newsId) {
+    public AdminNewsDto publishNews(UserPrincipal principal, UUID newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new NotFoundException("Noticia no encontrada"));
         news.setStatus(NewsStatus.PUBLISHED);
@@ -230,6 +235,8 @@ public class AdminService {
             news.setPublishedAt(Instant.now());
         }
         newsRepository.save(news);
+        auditService.record(principal, "NEWS_PUBLISHED", "news", news.getId().toString(),
+                Map.of("title", news.getTitle()));
         return toNewsDto(news);
     }
 
@@ -240,7 +247,8 @@ public class AdminService {
     }
 
     @Transactional
-    public ContactMessageDto updateContactStatus(UUID messageId, ContactStatusRequest request) {
+    public ContactMessageDto updateContactStatus(UserPrincipal principal, UUID messageId,
+                                                 ContactStatusRequest request) {
         ContactMessage message = contactMessageRepository.findById(messageId)
                 .orElseThrow(() -> new NotFoundException("Mensaje no encontrado"));
         try {
@@ -249,6 +257,8 @@ public class AdminService {
             throw new BusinessException("Estado de mensaje inválido: " + request.status());
         }
         contactMessageRepository.save(message);
+        auditService.record(principal, "CONTACT_STATUS_UPDATED", "contact_message",
+                message.getId().toString(), Map.of("status", message.getStatus().name()));
         return toContactDto(message);
     }
 
@@ -257,17 +267,19 @@ public class AdminService {
     }
 
     @Transactional
-    public PublicInstitutionDto updateInstitution(Map<String, Object> values) {
+    public PublicInstitutionDto updateInstitution(UserPrincipal principal, Map<String, Object> values) {
         try {
             settingsService.updateInstitution(objectMapper.writeValueAsString(values));
         } catch (Exception ex) {
             throw new BusinessException("No fue posible actualizar la configuración institucional");
         }
+        auditService.record(principal, "SETTINGS_UPDATED", "site_setting", "institution",
+                Map.of("keys", values.keySet().stream().sorted().toList()));
         return settingsService.institution();
     }
 
     @Transactional
-    public void linkParent(ParentLinkRequest request) {
+    public void linkParent(UserPrincipal principal, ParentLinkRequest request) {
         User user = userRepository.findByEmailIgnoreCase(request.parentEmail())
                 .orElseThrow(() -> new NotFoundException("Acudiente no encontrado"));
         if (user.getRole() != Role.PARENT) {
@@ -299,6 +311,8 @@ public class AdminService {
         link.setRelationship(relationship);
         link.setAuthorized(true);
         parentStudentRepository.save(link);
+        auditService.record(principal, "PARENT_LINKED", "parent_student", link.getId().toString(),
+                Map.of("parentId", parent.getId().toString(), "studentId", student.getId().toString()));
     }
 
     private void applyNews(News news, NewsRequest request, UserPrincipal principal) {

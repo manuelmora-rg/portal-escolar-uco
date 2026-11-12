@@ -11,13 +11,48 @@ El proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 #### Documentación y base del proyecto
 
 - `README.md` con stack, entorno, requisitos, inicio rápido, credenciales demo y estado real.
-- `ARCHITECTURE.md` con arquitectura, modelo de datos (31 tablas), matriz de permisos, mapa de
+- `ARCHITECTURE.md` con arquitectura, modelo de datos (32 tablas), matriz de permisos, mapa de
   API implementado, estructura del frontend, mapa del sitio, flujos, pruebas, despliegue y riesgos.
 - `PLAN.md` con el avance por fases y las tareas pendientes declaradas explícitamente.
 - `CHANGELOG.md` y `.gitignore`.
 - Repositorio Git local en la rama `main`.
 - `scripts/env.ps1` y `scripts/db-setup.ps1`.
 - `scripts/test-api.ps1`: prueba de humo de la API con 39 casos.
+- `API_DOCUMENTATION.md`: referencia completa de autenticación, usuarios, invitaciones, auditoría,
+  endpoints por rol, contratos y ejemplos.
+
+#### Identidad, seguridad y auditoría
+
+- Migración `V4__invitaciones_auditoria.sql` con la tabla `invitation` (token hasheado, vigencia,
+  uso único y revocación).
+- Gestión de usuarios desde el panel admin: listar, consultar, crear, editar, activar/desactivar y
+  restablecer contraseña.
+- Invitaciones para crear cuentas sin registro público libre: token aleatorio mostrado una sola
+  vez, guardado como hash SHA-256, vigencia de 7 días y revocación de invitaciones pendientes del
+  mismo correo.
+- Aceptación pública de invitación con creación del perfil correspondiente al rol.
+- El rol es inmutable después de crear el usuario; desactivar una cuenta revoca sus refresh tokens.
+- Protección para que un administrador no pueda desactivarse a sí mismo ni dejar el sistema sin
+  administradores activos.
+- Auditoría general en `audit_log` para usuarios, invitaciones, noticias, mensajes de contacto,
+  configuración institucional y vínculos padre-hijo.
+- Endpoints admin nuevos: `GET/POST /admin/users`, `GET/PUT /admin/users/{id}`,
+  `PATCH /admin/users/{id}/status`, `POST /admin/users/{id}/reset-password`,
+  `GET/POST /admin/invitations` y `GET /admin/audit-logs`.
+- Endpoints públicos nuevos: `GET /auth/invitations/{token}` y `POST /auth/accept-invitation`.
+
+#### Pruebas automatizadas
+
+- Suite JUnit 5 + Spring Boot Test + MockMvc con **22 pruebas de integración** sobre
+  `portal_escolar_test`:
+  - autenticación, credenciales inválidas, 401 anónimo y refresh rotativo;
+  - autorización cruzada entre los cuatro roles;
+  - alta de docentes/estudiantes, desactivación, autodesactivación bloqueada y reset de contraseña;
+  - invitación de un solo uso y auditoría de acciones administrativas;
+  - aislamiento padre-hijo (IDOR) y acceso denegado a estudiantes no vinculados;
+  - flujo académico completo: nota, corrección, asistencia, tarea y entrega.
+- Perfil `test` con `application-test.yml` y datos demo controlados.
+- Corrección de advertencias de validación en listas anidadas (`@Valid` sobre el tipo del elemento).
 
 #### Backend
 
@@ -55,6 +90,12 @@ El proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- La auditoría usaba `audit_log` y `app_user` sin calificar el esquema `portal`, lo que abortaba
+  transacciones de negocio; ahora usa `portal.audit_log` y `portal.app_user`.
+- El matcher de rutas no-API usaba `getServletPath()`, lo que devolvía `403` en lugar de `401`
+  para peticiones anónimas con MockMvc; ahora usa `getRequestURI()`.
+- Los errores no controlados ahora se registran en el log del servidor sin exponer detalles al
+  cliente.
 - Las fechas sin hora (`YYYY-MM-DD`) se interpretaban con desfase por zona horaria; ahora se
   parsean como fecha local.
 - El favicon y los recursos estáticos eran bloqueados por seguridad; se permitió su acceso sin
@@ -65,7 +106,8 @@ El proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Notas
 
-- Verificado: compilación backend, build frontend, `scripts/test-api.ps1` 39/39, render de
-  33 rutas con Chrome headless sin errores de consola.
-- Pendiente y declarado en `PLAN.md`: suites JUnit/Vitest, accesibilidad formal, respaldos,
+- Verificado: compilación backend, `mvnw test` 22/22, `scripts/test-api.ps1` 39/39, build
+  frontend y render de 33 rutas con Chrome headless sin errores de consola.
+- Migraciones Flyway `V1`–`V4` aplicadas en `portal_escolar` y `portal_escolar_test`.
+- Pendiente y declarado en `PLAN.md`: suite frontend (Vitest), accesibilidad formal, respaldos,
   monitoreo, despliegue y definición de nombre/identidad definitiva del colegio.

@@ -148,7 +148,14 @@ Formato único basado en `ProblemDetail` (RFC 9457):
 
 ### 2.5 Auditoría
 
-- `audit_log`: acciones administrativas y de seguridad.
+- `audit_log`: registro general de acciones administrativas y de seguridad, con actor, acción,
+  entidad, identificador, detalles JSONB, IP y fecha. Se escribe con `JdbcTemplate` y SQL
+  parametrizado (sin concatenación) sobre `portal.audit_log`.
+- Acciones cubiertas: alta/edición/estado de usuarios, restablecimiento de contraseña,
+  invitaciones creadas y aceptadas, noticias, mensajes de contacto, configuración institucional y
+  vínculos padre-hijo.
+- La auditoría es de **mejor esfuerzo**: si el registro falla, se escribe un `WARN` en el log y la
+  operación de negocio continúa.
 - `grade_audit`: cada creación/modificación/anulación de calificación guarda valor anterior, nuevo,
   usuario, motivo, fecha e IP.
 - `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, `@LastModifiedBy` vía auditoría JPA.
@@ -170,6 +177,7 @@ erDiagram
     APP_USER ||--o| TEACHER_PROFILE : "es"
     APP_USER ||--o| PARENT_PROFILE : "es"
     APP_USER ||--o{ REFRESH_TOKEN : "posee"
+    APP_USER ||--o{ INVITATION : "invita"
     PARENT_PROFILE ||--o{ PARENT_STUDENT : "vincula"
     STUDENT_PROFILE ||--o{ PARENT_STUDENT : "vinculado"
 
@@ -223,9 +231,12 @@ erDiagram
 | `parent_profile` | `id`, `user_id`, `document_number`, `phone`, `occupation`, `address` | `user_id` único |
 | `parent_student` | `id`, `parent_id`, `student_id`, `relationship`, `authorized`, `created_at` | único (`parent_id`, `student_id`) |
 | `refresh_token` | `id`, `user_id`, `token_hash`, `expires_at`, `revoked`, `created_at`, `user_agent`, `ip` | índice por `user_id`; se guarda el hash, nunca el token |
+| `invitation` | `id`, `email`, `role`, `token_hash`, `expires_at`, `used_at`, `revoked_at`, `created_by`, `created_at` | `token_hash` único; se guarda solo el hash SHA-256; rol válido por `CHECK` |
 
 `role` ∈ `ADMIN`, `TEACHER`, `STUDENT`, `PARENT`.
 `relationship` ∈ `FATHER`, `MOTHER`, `GUARDIAN`, `OTHER`.
+
+El esquema completo tiene **32 tablas** (31 originales + `invitation`, añadida en `V4`).
 
 #### Estructura académica
 
@@ -303,13 +314,20 @@ redes sociales. Así la identidad visual y los textos institucionales se cambian
 - Bloqueo temporal tras N intentos fallidos (por usuario + IP) y registro en `audit_log`.
 - El access token se mantiene solo en memoria en el frontend (nunca en `localStorage`).
 - Cambio obligatorio de contraseña en el primer ingreso (`must_change_password`).
+- No existe registro público libre: las cuentas se crean por invitación del administrador o por
+  alta directa desde el panel admin. El token de invitación se muestra una sola vez y se almacena
+  como hash SHA-256; vence a los 7 días y es de un solo uso.
+- Al desactivar una cuenta se revocan todos sus refresh tokens. El rol no puede modificarse
+  después de crear el usuario.
 
 ### 4.2 Contraseñas
 
 - BCrypt strength 12.
 - Longitud mínima 10, máximo 72 bytes (límite de BCrypt), sin truncamiento silencioso.
-- Se rechazan las más comunes (lista local) y las que contienen el email o el nombre.
+- La nueva contraseña debe ser diferente a la actual al cambiarla.
+- Las contraseñas temporales se generan con `SecureRandom` y se muestran una sola vez.
 - Nunca se devuelve el hash ni se registra la contraseña en logs.
+- Pendiente para producción: lista de contraseñas comunes y validación contra el correo/nombre.
 
 ### 4.3 Autorización
 
@@ -322,6 +340,9 @@ Tres niveles, todos en el backend:
    - `assertCanManageCourseSubject(user, courseSubjectId)` → docente asignado.
    - `assertCanAccessChild(user, studentId)` → vínculo autorizado.
    - `assertCanManageUser(user, targetId)` → solo admin (con protecciones para no autoeliminarse).
+4. **Invitaciones:** `GET /auth/invitations/{token}` y `POST /auth/accept-invitation` son públicos,
+   pero solo permiten consultar/activar una invitación válida. El correo y el rol provienen de la
+   invitación, no del cuerpo enviado por el cliente.
 
 Un 403 se devuelve tanto si el recurso no existe como si no se tiene acceso cuando revelar la
 existencia sería un problema de privacidad.
@@ -329,14 +350,16 @@ existencia sería un problema de privacidad.
 ### 4.4 Protección de la API
 
 - CORS restringido a `CORS_ALLOWED_ORIGINS`; en producción, mismo origen.
-- CSRF: la API usa `Authorization: Bearer`, no cookies para el access token. El endpoint de refresh
-  valida `SameSite=Strict` y un encabezado personalizado; se documentará la estrategia exacta.
-- Rate limiting en login, contacto y subida de archivos.
-- Límites de tamaño de request y de archivos.
+- CSRF: la API usa `Authorization: Bearer`, no cookies para el access token. El refresh token vive
+  en una cookie `HttpOnly`, `SameSite=Strict` y `Path=/api/v1/auth`, y rota en cada uso. El
+  formulario público de contacto y el login no dependen de cookies de sesión.
+- Rate limiting en login (5 intentos fallidos por correo + IP / 15 min).
+- Límites de tamaño de request (`max-file-size` 10 MB, `max-request-size` 12 MB).
 - Validación y normalización de todas las entradas.
-- Consultas parametrizadas por JPA; prohibido concatenar SQL.
-- Encabezados de seguridad: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP.
-- Swagger/OpenAPI deshabilitado o protegido en producción.
+- Consultas parametrizadas por JPA y `JdbcTemplate`; prohibido concatenar SQL.
+- Encabezados de seguridad: `X-Content-Type-Options`, `X-Frame-Options: DENY`,
+  `Referrer-Policy: no-referrer`. La CSP queda pendiente para producción.
+- OpenAPI no está configurado; la API se documenta en `API_DOCUMENTATION.md`.
 - Logs sin datos personales sensibles ni tokens.
 
 ### 4.5 Datos personales
@@ -344,8 +367,8 @@ existencia sería un problema de privacidad.
 - Endpoints públicos solo exponen contenido institucional publicado.
 - Las notas, asistencia y observaciones nunca aparecen en respuestas públicas ni en rutas
   adivinables.
-- Descargas de archivos pasan por un controlador que valida pertenencia antes de servir el archivo.
-- Las URLs de archivos no son públicas ni enumerables.
+- La carga/descarga de archivos no forma parte del MVP. Cuando se implemente, deberá pasar por un
+  controlador que valide pertenencia antes de servir el archivo, con URLs no enumerables.
 - Se documentará una política de retención y borrado para producción.
 
 ---
@@ -426,6 +449,8 @@ POST /auth/refresh
 POST /auth/logout
 GET  /auth/me                       # usuario, rol, perfil
 POST /auth/change-password
+GET  /auth/invitations/{token}      # información pública de una invitación válida
+POST /auth/accept-invitation        # activa la cuenta asociada a la invitación
 ```
 
 **Estudiante** (`/student`, rol `STUDENT`)
@@ -492,6 +517,15 @@ PATCH /parent/notifications/{notificationId}/read
 
 ```text
 GET  /admin/dashboard
+GET  /admin/users                   # listado de cuentas
+GET  /admin/users/{userId}
+POST /admin/users                   # alta directa con contraseña temporal
+PUT  /admin/users/{userId}          # nombre, apellido y correo (rol inmutable)
+PATCH /admin/users/{userId}/status  # activar/desactivar
+POST /admin/users/{userId}/reset-password
+GET  /admin/invitations
+POST /admin/invitations             # token mostrado una sola vez
+GET  /admin/audit-logs?limit        # auditoría general (1–500)
 GET  /admin/students
 GET  /admin/teachers
 GET  /admin/parents
@@ -764,16 +798,19 @@ Estudiante ve tareas de sus cursos → sube archivo
 
 ## 10. Pruebas
 
-| Nivel | Herramienta | Alcance |
-|-------|-------------|---------|
-| Unitarias backend | JUnit 5 + Mockito | Servicios, validadores, reglas de negocio, JWT |
-| Integración backend | Spring Boot Test + PostgreSQL de prueba | Repositorios, seguridad, controladores, migraciones |
-| Seguridad | Tests dedicados | Acceso cruzado entre estudiantes, padres no autorizados, roles |
-| Frontend unitario | Vitest + React Testing Library | Componentes, hooks, servicios |
-| E2E (opcional) | Playwright | Flujos críticos de los cuatro roles |
+| Nivel | Herramienta | Alcance | Estado |
+|-------|-------------|---------|--------|
+| Integración backend | JUnit 5 + Spring Boot Test + MockMvc | Autenticación, roles, usuarios, invitaciones, auditoría, IDOR y flujo académico | ✅ 22/22 |
+| Integración con PostgreSQL | Perfil `test` sobre `portal_escolar_test` | Migraciones Flyway, repositorios y transacciones reales | ✅ |
+| Seguridad | Tests dedicados | Acceso cruzado entre roles, estudiantes y padres no autorizados | ✅ |
+| Humo de API | `scripts/test-api.ps1` | Login, roles, aislamiento 403 y CRUD principal contra el backend real | ✅ 39/39 |
+| Frontend unitario | Vitest + React Testing Library | Componentes, hooks, servicios | ⏳ pendiente |
+| E2E (opcional) | Playwright | Flujos críticos de los cuatro roles | ⏳ pendiente |
 
-Como Docker no está instalado, los tests de integración usarán una base local `portal_escolar_test`
-creada por script. Si más adelante se instala Docker, se migrará a Testcontainers.
+La suite de integración se ejecuta con `mvnw test` y usa una base local `portal_escolar_test`
+creada por script. El perfil `test` carga los mismos datos ficticios que `dev`
+(`DemoDataInitializer`) y aplica Flyway `V1`–`V4`. Como Docker no está instalado, no se usa
+Testcontainers; si se instala más adelante, la migración es directa.
 
 Criterio: ninguna fase se declara terminada sin que sus pruebas pasen y sin verificar el flujo real.
 
@@ -783,8 +820,9 @@ Criterio: ninguna fase se declara terminada sin que sus pruebas pasen y sin veri
 
 ### 11.1 Perfiles
 
-- `dev`: base local, CORS a `localhost:5173`, Swagger habilitado, logs detallados.
-- `test`: base de pruebas, datos efímeros.
+- `dev`: base local, CORS a `localhost:5173`, Swagger habilitado, logs detallados, datos demo.
+- `test`: base `portal_escolar_test`, datos demo, JWT de prueba, logs reducidos; se usa en
+  `mvnw test`.
 - `prod`: variables de entorno obligatorias, Swagger deshabilitado, logs sin datos sensibles,
   `Secure` cookies, CORS restringido, Flyway al arrancar.
 

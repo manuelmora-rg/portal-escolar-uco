@@ -29,7 +29,7 @@ public final class TeacherDtos {
     }
 
     public record GradeBatchRequest(
-            @NotEmpty @Valid List<GradeEntry> entries
+            @NotEmpty List<@Valid GradeEntry> entries
     ) {
     }
 
@@ -42,7 +42,7 @@ public final class TeacherDtos {
 
     public record AttendanceBatchRequest(
             @NotNull LocalDate date,
-            @NotEmpty @Valid List<AttendanceEntry> entries
+            @NotEmpty List<@Valid AttendanceEntry> entries
     ) {
     }
 

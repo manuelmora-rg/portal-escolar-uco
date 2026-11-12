@@ -81,7 +81,7 @@ import java.util.UUID;
  * Las contraseñas se generan con BCrypt en tiempo de ejecución; nunca se guardan en texto plano.
  */
 @Component
-@Profile("dev")
+@Profile({"dev", "test"})
 @ConditionalOnProperty(name = "app.demo.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j

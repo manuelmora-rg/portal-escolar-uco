@@ -1,7 +1,8 @@
 # Plan de trabajo — Portal Escolar
 
-Estado: **MVP implementado y verificado.** Fases 1–6 completadas; Fase 7 parcial; Fase 8 pendiente.
-Última actualización: 2026-11-10.
+Estado: **MVP implementado y verificado, con identidad por invitación, auditoría y pruebas de integración.**
+Fases 1–6 completadas; Fase 7 parcial (backend cubierto, frontend pendiente); Fase 8 pendiente.
+Última actualización: 2026-11-11.
 
 Leyenda: `[x]` completado y verificado · `[ ]` pendiente · `[~]` en curso · `[!]` bloqueado.
 
@@ -59,7 +60,7 @@ Leyenda: `[x]` completado y verificado · `[ ]` pendiente · `[~]` en curso · `
 - [x] Proyecto Spring Boot 4.1.2 con Java 21 y Maven Wrapper.
 - [x] `application.yml` por perfiles y variables de entorno.
 - [x] Flyway y esquema `portal`.
-- [x] Migración `V1__esquema_inicial.sql` (31 tablas) + `V2` y `V3`.
+- [x] Migración `V1__esquema_inicial.sql` (31 tablas) + `V2`, `V3` y `V4` (`invitation`).
 - [ ] OpenAPI (no configurado; la API se documenta en `ARCHITECTURE.md`).
 - [x] Manejo global de errores con `ProblemDetail` (incluye 404 de recursos).
 - [x] CORS y cabeceras de seguridad.
@@ -148,10 +149,17 @@ Leyenda: `[x]` completado y verificado · `[ ]` pendiente · `[~]` en curso · `
 
 ## Fase 7 — Pruebas y correcciones [~]
 
-- [~] Suite backend formal (JUnit/Mockito): pendiente; existe prueba de humo de API.
+- [x] Suite backend formal (JUnit 5 + MockMvc): 22 pruebas de integración sobre `portal_escolar_test`.
 - [ ] Suite frontend (Vitest + Testing Library): pendiente.
 - [x] Verificación de render de 33 rutas (público + 4 roles) sin errores de consola.
 - [x] Prueba de humo de API: 39/39 casos, incluidos 403 de aislamiento.
+- [x] Pruebas de autenticación: login, credenciales inválidas, 401 anónimo, refresh rotativo.
+- [x] Pruebas de autorización: 403 entre los cuatro roles.
+- [x] Pruebas de identidad: alta de usuarios, desactivación, autodesactivación bloqueada, reset de contraseña.
+- [x] Pruebas de invitaciones: token de un solo uso, información pública y aceptación.
+- [x] Pruebas de auditoría: registro de acciones administrativas.
+- [x] Pruebas de aislamiento padre-hijo (IDOR): acceso a hijos vinculados y 403 a ajenos.
+- [x] Prueba de flujo académico: nota, corrección, asistencia, tarea y entrega.
 - [~] Pruebas manuales responsive: revisión básica; falta tableta/móvil real.
 - [ ] Revisión de accesibilidad (teclado, contraste, etiquetas).
 - [~] Revisión de seguridad: IDOR y roles cubiertos; falta pentest formal.
@@ -216,9 +224,9 @@ Un módulo se considera terminado cuando:
 6. Está documentado en `CHANGELOG.md` y, si aplica, en `ARCHITECTURE.md`.
 7. Se verificó en escritorio y en ancho móvil.
 
-> Nota honesta: el MVP cumple 1, 3, 4, 5, 6 y verificación de escritorio. Las suites
-> automatizadas formales (punto 2) y la verificación en dispositivos móviles reales (punto 7)
-> siguen pendientes y se registran como tales.
+> Nota honesta: el MVP cumple 1, 3, 4, 5, 6 y verificación de escritorio. La suite backend
+> automatizada (punto 2) ya está cubierta con 22 pruebas de integración; la suite frontend y la
+> verificación en dispositivos móviles reales (punto 7) siguen pendientes y se registran como tales.
 
 ---
 
@@ -234,3 +242,5 @@ Un módulo se considera terminado cuando:
 | 2026-11-10 | 5 | Frontend completo: sitio público y cuatro paneles. |
 | 2026-11-10 | 6 | Integración verificada; SPA servida por Spring Boot. |
 | 2026-11-10 | 7 | Prueba de humo 39/39 y render de 33 rutas sin errores de consola. |
+| 2026-11-11 | 7 | Identidad por invitación, auditoría general y 22 pruebas JUnit de integración (22/22). |
+| 2026-11-11 | 7 | Migración `V4` aplicada en desarrollo; `API_DOCUMENTATION.md` publicado. |

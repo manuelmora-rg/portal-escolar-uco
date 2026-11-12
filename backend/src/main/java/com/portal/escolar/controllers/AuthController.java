@@ -1,11 +1,15 @@
 package com.portal.escolar.controllers;
 
+import com.portal.escolar.dto.AdminDtos.InvitationInfoDto;
+import com.portal.escolar.dto.AuthDtos.AcceptInvitationRequest;
+import com.portal.escolar.dto.AuthDtos.AcceptedInvitationDto;
 import com.portal.escolar.dto.AuthDtos.AuthResponse;
 import com.portal.escolar.dto.AuthDtos.ChangePasswordRequest;
 import com.portal.escolar.dto.AuthDtos.LoginRequest;
 import com.portal.escolar.dto.AuthDtos.UserSummary;
 import com.portal.escolar.security.CurrentUser;
 import com.portal.escolar.services.AuthService;
+import com.portal.escolar.services.IdentityAdminService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,9 +17,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +36,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final IdentityAdminService identityAdminService;
 
     @Value("${app.jwt.cookie-name}")
     private String cookieName;
@@ -75,6 +82,18 @@ public class AuthController {
         authService.changePassword(CurrentUser.require(), request);
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookie("", 0).toString());
         return ResponseEntity.ok(Map.of("message", "Contraseña actualizada. Inicia sesión de nuevo."));
+    }
+
+    @GetMapping("/invitations/{token}")
+    public ResponseEntity<InvitationInfoDto> invitationInfo(@PathVariable String token) {
+        return ResponseEntity.ok(identityAdminService.invitationInfo(token));
+    }
+
+    @PostMapping("/accept-invitation")
+    public ResponseEntity<AcceptedInvitationDto> acceptInvitation(
+            @Valid @RequestBody AcceptInvitationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(identityAdminService.acceptInvitation(request));
     }
 
     private ResponseCookie cookie(String value, long maxAgeSeconds) {
