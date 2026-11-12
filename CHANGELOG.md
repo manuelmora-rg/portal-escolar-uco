@@ -25,8 +25,8 @@ El proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 
 - Migración `V4__invitaciones_auditoria.sql` con la tabla `invitation` (token hasheado, vigencia,
   uso único y revocación).
-- Gestión de usuarios desde el panel admin: listar, consultar, crear, editar, activar/desactivar y
-  restablecer contraseña.
+- Gestión de usuarios expuesta por la API del panel admin: listar, consultar, crear, editar,
+  activar/desactivar y restablecer contraseña. La interfaz web correspondiente queda pendiente.
 - Invitaciones para crear cuentas sin registro público libre: token aleatorio mostrado una sola
   vez, guardado como hash SHA-256, vigencia de 7 días y revocación de invitaciones pendientes del
   mismo correo.

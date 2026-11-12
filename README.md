@@ -190,19 +190,21 @@ de seguridad.
 |------|--------|---------|
 | Base de datos | ✅ | 32 tablas en el esquema `portal` (31 + `invitation`), migraciones Flyway `V1`–`V4`, datos demo en `dev`. |
 | Seguridad | ✅ | JWT de acceso + refresh rotativo en cookie HttpOnly, BCrypt 12, rate limit de login, autorización por rol y por recurso. |
-| Identidad | ✅ | Cuentas creadas por invitación del administrador (sin registro público), invitaciones de un solo uso con token hasheado, activación/desactivación, restablecimiento de contraseña y rol inmutable. |
+| Identidad | ✅ | API de cuentas por invitación del administrador (sin registro público), invitaciones de un solo uso con token hasheado, activación/desactivación, restablecimiento de contraseña y rol inmutable. Interfaz web pendiente. |
 | API pública | ✅ | Institución, oferta académica, noticias, eventos, galería y contacto. |
 | Panel estudiante | ✅ | Inicio, calificaciones, horario, tareas con entrega, materiales, asistencia, observaciones, notificaciones. |
 | Panel docente | ✅ | Inicio, cursos, libro de notas (crear/editar), asistencia por lote, tareas y calificación de entregas, observaciones, materiales. |
 | Panel de padres | ✅ | Hijos autorizados, resumen, calificaciones por periodo, horario, tareas, asistencia, observaciones, reuniones. |
-| Panel admin | ✅ | Inicio, usuarios, invitaciones, estudiantes, docentes, padres y vínculos, cursos, materias, matrículas, noticias (CRUD/publicación), mensajes, configuración institucional y auditoría. |
+| Panel admin | ✅ | Inicio, estudiantes, docentes, padres y vínculos, cursos, materias, matrículas, noticias (CRUD/publicación), mensajes y configuración institucional. |
+| API admin de identidad | ✅ | Usuarios, invitaciones y auditoría expuestos por la API; falta su interfaz en el panel web. |
 | Auditoría | ✅ | Registro general en `audit_log` (usuarios, invitaciones, noticias, mensajes, configuración y vínculos) y auditoría de cambios de calificaciones. |
 | Pruebas backend | ✅ | 22 pruebas JUnit de integración sobre `portal_escolar_test`: autenticación, roles, IDOR, usuarios, invitaciones, auditoría y flujo académico. |
 | SPA servida por Spring Boot | ✅ | Build de Vite copiado a `static`, fallback a `index.html`, recursos estáticos públicos. |
 | Verificación | ✅ | `mvnw test` (22/22), `scripts/test-api.ps1` (39/39), compilación backend, build frontend y render de 33 rutas con Chrome headless sin errores de consola. |
 
-Pendiente para producción: nombre/identidad definitiva del colegio, suite frontend (Vitest +
-Testing Library), revisión de accesibilidad, respaldos y monitoreo. Ver `PLAN.md`.
+Pendiente para producción: nombre/identidad definitiva del colegio, interfaz web de usuarios,
+invitaciones y auditoría (la API ya existe), suite frontend (Vitest + Testing Library), revisión de
+accesibilidad, respaldos y monitoreo. Ver `PLAN.md`.
 
 ---
 

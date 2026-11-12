@@ -133,6 +133,7 @@ Leyenda: `[x]` completado y verificado · `[ ]` pendiente · `[~]` en curso · `
 - [x] Panel docente completo.
 - [x] Panel de padres completo.
 - [x] Panel administrativo completo.
+- [ ] Pantallas web de usuarios, invitaciones y auditoría (la API backend ya está implementada).
 - [x] Estados de carga, vacío y error.
 
 ---
@@ -151,6 +152,7 @@ Leyenda: `[x]` completado y verificado · `[ ]` pendiente · `[~]` en curso · `
 
 - [x] Suite backend formal (JUnit 5 + MockMvc): 22 pruebas de integración sobre `portal_escolar_test`.
 - [ ] Suite frontend (Vitest + Testing Library): pendiente.
+- [ ] Interfaz web de usuarios, invitaciones y auditoría: pendiente (endpoints backend listos).
 - [x] Verificación de render de 33 rutas (público + 4 roles) sin errores de consola.
 - [x] Prueba de humo de API: 39/39 casos, incluidos 403 de aislamiento.
 - [x] Pruebas de autenticación: login, credenciales inválidas, 401 anónimo, refresh rotativo.
