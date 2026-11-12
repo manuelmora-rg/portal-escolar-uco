@@ -102,7 +102,7 @@ export default function StudentAssignments() {
                     {assignment.submission ? (
                       <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800/60">
                         {assignment.submission.score != null ? (
-                          <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+                          <p className="font-semibold text-brand-700 dark:text-brand-300">
                             Nota: {Number(assignment.submission.score).toFixed(1)}
                           </p>
                         ) : null}

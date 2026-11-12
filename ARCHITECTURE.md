@@ -636,30 +636,27 @@ La protección del frontend es **solo de experiencia de usuario**. El backend vu
 
 ### 7.5 Identidad visual
 
-- Tokens en `styles/tokens.css`:
+- Paleta institucional centralizada en `frontend/src/index.css` mediante tokens `@theme` de Tailwind 4:
 
 ```css
-:root {
-  --color-primary-900: #0b2545;  /* azul oscuro */
-  --color-primary-700: #13315c;
-  --color-primary-500: #1d4ed8;  /* azul */
-  --color-accent-400:  #38bdf8;  /* azul claro */
-  --color-surface:     #ffffff;
-  --color-bg:          #f4f7fb;  /* gris claro */
-  --color-text:        #0f172a;
-  --radius-md: 12px;
-  --font-sans: "Inter", system-ui, sans-serif;
-}
-
-[data-theme="dark"] {
-  --color-bg: #0b1220;
-  --color-surface: #111c2e;
-  --color-text: #e6edf7;
+@theme {
+  --color-brand-900: #14532d;  /* verde oscuro: sidebar, botones y activos */
+  --color-brand-600: #228b4e;  /* verde principal: enlaces y detalles */
+  --color-brand-100: #dcfce7;  /* verde claro: etiquetas y selección */
+  --color-brand-50:  #f0fdf4;  /* verde muy claro: fondos de sección */
+  --color-accent-500: #228b4e;
+  --color-slate-200: #e2e8f0;  /* bordes y separadores */
+  --color-slate-500: #64748b;  /* textos secundarios */
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
 }
 ```
 
-- El administrador podrá cambiar logo, nombre y color primario desde configuración; se aplican
-  como variables CSS en tiempo de ejecución.
+- Las tarjetas, formularios y paneles de lectura usan blanco; los grises se reservan para textos
+  secundarios, bordes y separadores.
+- El modo oscuro (`[data-theme="dark"]`) conserva la identidad verde con superficies verde muy
+  oscuro y los mismos acentos.
+- El administrador puede guardar logo, nombre y colores institucionales en configuración; la
+  paleta base de la interfaz se mantiene centralizada en los tokens.
 - Tipografía Inter (o similar) con fallback del sistema.
 - Iconografía `lucide-react`.
 - Animaciones sutiles: transiciones de 150–250 ms, respeto a `prefers-reduced-motion`.

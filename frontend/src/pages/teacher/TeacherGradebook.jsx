@@ -223,7 +223,7 @@ export default function TeacherGradebook() {
                         <tr key={grade.id}>
                           <td className="font-medium text-slate-800 dark:text-slate-100">{grade.title}</td>
                           <td><Badge tone="slate">{grade.type}</Badge></td>
-                          <td className={Number(grade.score) < 3 ? 'font-semibold text-rose-600 dark:text-rose-400' : 'font-semibold text-emerald-600 dark:text-emerald-400'}>
+                          <td className={Number(grade.score) < 3 ? 'font-semibold text-rose-600 dark:text-rose-400' : 'font-semibold text-brand-700 dark:text-brand-300'}>
                             {Number(grade.score).toFixed(1)}
                           </td>
                           <td className="text-slate-500 dark:text-slate-400">{Number(grade.weight).toFixed(0)}%</td>

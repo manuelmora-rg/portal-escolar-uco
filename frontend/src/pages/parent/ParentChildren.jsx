@@ -222,7 +222,7 @@ export default function ParentChildren() {
                                   <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{grade.title}</p>
                                   <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(grade.date)} · peso {Number(grade.weight).toFixed(0)}%</p>
                                 </div>
-                                <span className={`font-semibold ${Number(grade.score) < 3 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                <span className={`font-semibold ${Number(grade.score) < 3 ? 'text-rose-600 dark:text-rose-400' : 'text-brand-700 dark:text-brand-300'}`}>
                                   {Number(grade.score).toFixed(1)}
                                 </span>
                               </div>
@@ -296,7 +296,7 @@ export default function ParentChildren() {
                     </p>
                     {assignment.description ? <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{assignment.description}</p> : null}
                     {assignment.submission?.score != null ? (
-                      <p className="mt-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                      <p className="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-300">
                         Nota: {Number(assignment.submission.score).toFixed(1)}
                       </p>
                     ) : null}

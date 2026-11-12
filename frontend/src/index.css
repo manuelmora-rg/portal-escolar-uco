@@ -3,22 +3,33 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
-  --color-brand-50: #eef4fb;
-  --color-brand-100: #d8e6f5;
-  --color-brand-200: #b6cfe9;
-  --color-brand-300: #87aed8;
-  --color-brand-400: #5586c1;
-  --color-brand-500: #3568a6;
-  --color-brand-600: #265189;
-  --color-brand-700: #1d4070;
-  --color-brand-800: #142f55;
-  --color-brand-900: #0b2545;
-  --color-brand-950: #061729;
+  /* Identidad institucional: verde oscuro, verde principal y verdes claros */
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #2fa85c;
+  --color-brand-600: #228b4e;
+  --color-brand-700: #1a6b3c;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+  --color-brand-950: #0b2e1a;
 
-  --color-accent-300: #7dd3fc;
-  --color-accent-400: #38bdf8;
-  --color-accent-500: #0ea5e9;
-  --color-accent-600: #0284c7;
+  --color-accent-200: #bbf7d0;
+  --color-accent-300: #86efac;
+  --color-accent-400: #4ade80;
+  --color-accent-500: #228b4e;
+  --color-accent-600: #1a6b3c;
+  --color-accent-700: #166534;
+
+  /* Grises de apoyo y superficies con un tinte verde muy sutil */
+  --color-slate-50: #f0fdf4;
+  --color-slate-100: #e8f8ee;
+  --color-slate-700: #23402e;
+  --color-slate-800: #16351f;
+  --color-slate-900: #0b2416;
+  --color-slate-950: #06170e;
 
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -57,7 +68,7 @@ body {
   }
 
   .card-title {
-    @apply text-base font-semibold text-slate-900 dark:text-white;
+    @apply text-base font-semibold text-brand-900 dark:text-brand-50;
   }
 
   .label {
@@ -77,11 +88,11 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm font-semibold text-brand-800 transition hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-brand-800 dark:bg-slate-900 dark:text-brand-100 dark:hover:bg-brand-900/40;
   }
 
   .btn-ghost {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-brand-50 hover:text-brand-900 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-brand-900/40 dark:hover:text-brand-50;
   }
 
   .badge {
@@ -101,6 +112,13 @@ body {
   }
 
   .table-base tbody tr:hover {
-    @apply bg-slate-50/80 dark:bg-slate-800/40;
+    @apply bg-brand-50/80 dark:bg-brand-900/25;
+  }
+
+  /* Halo decorativo verde usado en las portadas institucionales */
+  .hero-glow {
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(74, 222, 128, 0.22), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(34, 139, 78, 0.35), transparent 42%);
   }
 }

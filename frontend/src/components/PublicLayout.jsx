@@ -51,8 +51,8 @@ export default function PublicLayout() {
                 className={({ isActive }) =>
                   `rounded-lg px-3 py-2 text-sm font-medium transition ${
                     isActive
-                      ? 'bg-brand-50 text-brand-900 dark:bg-slate-800 dark:text-white'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                      ? 'bg-brand-100 text-brand-900 dark:bg-brand-900/70 dark:text-brand-50'
+                      : 'text-slate-600 hover:bg-brand-50 hover:text-brand-900 dark:text-slate-300 dark:hover:bg-brand-900/40 dark:hover:text-white'
                   }`
                 }
               >
@@ -96,7 +96,7 @@ export default function PublicLayout() {
                   className={({ isActive }) =>
                     `rounded-lg px-3 py-2 text-sm font-medium ${
                       isActive
-                        ? 'bg-brand-50 text-brand-900 dark:bg-slate-800 dark:text-white'
+                        ? 'bg-brand-100 text-brand-900 dark:bg-brand-900/70 dark:text-brand-50'
                         : 'text-slate-600 dark:text-slate-300'
                     }`
                   }
@@ -153,7 +153,7 @@ export default function PublicLayout() {
             <p className="mt-3 text-sm text-slate-400">
               Estudiantes, docentes, acudientes y administradores acceden con las credenciales entregadas por la institución.
             </p>
-            <Link to="/login" className="btn-secondary mt-3 !border-slate-700 !bg-slate-900 !text-white hover:!bg-slate-800">
+            <Link to="/login" className="btn-secondary mt-3 !border-white/20 !bg-white/10 !text-white hover:!bg-white/20">
               Iniciar sesión
             </Link>
           </div>

@@ -70,14 +70,14 @@ export default function AppLayout() {
   const items = NAV_BY_ROLE[user?.role] || []
 
   const sidebar = (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-brand-900 dark:bg-slate-900">
       <Link to="/" className="flex items-center gap-2.5 px-5 py-5">
-        <span className="grid size-9 place-items-center rounded-xl bg-brand-900 text-white dark:bg-accent-500 dark:text-slate-950">
+        <span className="grid size-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15">
           <GraduationCap size={20} />
         </span>
         <span className="leading-tight">
-          <span className="block text-sm font-bold text-slate-900 dark:text-white">Portal Escolar</span>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400">{ROLE_LABEL[user?.role]}</span>
+          <span className="block text-sm font-bold text-white">Portal Escolar</span>
+          <span className="block text-[11px] text-brand-100/80">{ROLE_LABEL[user?.role]}</span>
         </span>
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
@@ -90,8 +90,8 @@ export default function AppLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                 isActive
-                  ? 'bg-brand-900 text-white dark:bg-accent-500 dark:text-slate-950'
-                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                  ? 'bg-white text-brand-900 shadow-sm'
+                  : 'text-brand-50/80 hover:bg-white/10 hover:text-white'
               }`
             }
           >
@@ -100,11 +100,11 @@ export default function AppLayout() {
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-slate-200 px-3 py-3 dark:border-slate-800">
+      <div className="border-t border-white/10 px-3 py-3">
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-rose-50 hover:text-rose-700 dark:text-slate-300 dark:hover:bg-rose-950/40 dark:hover:text-rose-200"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-brand-100/80 transition hover:bg-rose-500/20 hover:text-white"
         >
           <LogOut size={18} />
           Cerrar sesión
@@ -114,8 +114,8 @@ export default function AppLayout() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900">
+    <div className="min-h-screen bg-brand-50 dark:bg-slate-950">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-brand-800 bg-brand-900 lg:block dark:border-slate-800 dark:bg-slate-900">
         {sidebar}
       </aside>
 
@@ -127,7 +127,7 @@ export default function AppLayout() {
             onClick={() => setOpen(false)}
             aria-label="Cerrar menú"
           />
-          <aside className="relative h-full w-72 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <aside className="relative h-full w-72 border-r border-brand-800 bg-brand-900 dark:border-slate-800 dark:bg-slate-900">
             {sidebar}
           </aside>
         </div>
@@ -153,7 +153,7 @@ export default function AppLayout() {
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">{user?.fullName}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">{ROLE_LABEL[user?.role]}</p>
               </div>
-              <span className="grid size-9 place-items-center rounded-full bg-brand-100 text-sm font-bold text-brand-900 dark:bg-slate-800 dark:text-accent-300">
+              <span className="grid size-9 place-items-center rounded-full bg-brand-100 text-sm font-bold text-brand-900 dark:bg-brand-900/60 dark:text-brand-100">
                 {(user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')}
               </span>
             </div>

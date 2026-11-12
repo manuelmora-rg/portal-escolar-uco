@@ -105,11 +105,11 @@ export default function Contact() {
           </p>
 
           {sent ? (
-            <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900/60 dark:bg-emerald-950/40">
-              <p className="flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-200">
+            <div className="mt-6 rounded-xl border border-brand-200 bg-brand-50 p-5 dark:border-brand-800 dark:bg-brand-900/40">
+              <p className="flex items-center gap-2 font-semibold text-brand-700 dark:text-brand-100">
                 <CheckCircle2 size={18} /> Mensaje enviado
               </p>
-              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+              <p className="mt-1 text-sm text-brand-700 dark:text-brand-200">
                 Gracias por contactarnos. Nuestro equipo responderá a la mayor brevedad.
               </p>
               <button type="button" className="btn-secondary mt-4" onClick={() => setSent(false)}>

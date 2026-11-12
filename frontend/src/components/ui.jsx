@@ -2,11 +2,11 @@ import { AlertCircle, Inbox, Loader2, X } from 'lucide-react'
 
 const TONES = {
   slate: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
-  brand: 'bg-brand-100 text-brand-800 dark:bg-brand-900/60 dark:text-brand-100',
-  green: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200',
+  brand: 'bg-brand-50 text-brand-800 dark:bg-brand-900/40 dark:text-brand-100',
+  green: 'bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-100',
   amber: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200',
   red: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-200',
-  sky: 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-200',
+  sky: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
 }
 
 export function Badge({ children, tone = 'slate', className = '' }) {
@@ -21,7 +21,7 @@ export function PageHeader({ title, description, actions }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-brand-900 dark:text-brand-50">{title}</h1>
         {description ? <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
@@ -122,7 +122,7 @@ export function Tabs({ tabs, active, onChange }) {
           onClick={() => onChange(tab.value)}
           className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
             active === tab.value
-              ? 'bg-white text-brand-900 shadow-sm dark:bg-slate-900 dark:text-white'
+              ? 'bg-white text-brand-900 shadow-sm dark:bg-slate-900 dark:text-brand-50'
               : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100'
           }`}
         >

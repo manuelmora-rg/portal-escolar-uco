@@ -261,7 +261,7 @@ export default function TeacherAssignments() {
                   </a>
                 ) : null}
                 {submission.score != null ? (
-                  <p className="mt-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                  <p className="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-300">
                     Nota: {Number(submission.score).toFixed(1)}
                   </p>
                 ) : null}

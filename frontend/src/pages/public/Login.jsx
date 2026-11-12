@@ -50,7 +50,7 @@ export default function Login() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="relative hidden overflow-hidden bg-brand-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.25),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(14,165,233,0.16),transparent_40%)]" />
+        <div className="hero-glow absolute inset-0" />
         <Link to="/" className="relative flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-xl bg-accent-500 text-slate-950">
             <GraduationCap size={24} />

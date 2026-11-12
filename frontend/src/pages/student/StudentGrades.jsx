@@ -82,7 +82,7 @@ export default function StudentGrades() {
                           </td>
                           <td><Badge tone="slate">{grade.type}</Badge></td>
                           <td>
-                            <span className={`font-semibold ${Number(grade.score) < 3 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className={`font-semibold ${Number(grade.score) < 3 ? 'text-rose-600 dark:text-rose-400' : 'text-brand-700 dark:text-brand-300'}`}>
                               {Number(grade.score).toFixed(1)}
                             </span>
                           </td>

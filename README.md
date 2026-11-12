@@ -9,7 +9,9 @@ y administradores.
 > auditoría general y suite de integración JUnit (22/22). Ver "Estado de implementación" más abajo.
 >
 > **Nombre del colegio:** pendiente de definir. Se usa "Portal Escolar" como nombre provisional.
-> La identidad visual (escudo, colores, tipografía) está preparada para personalizarse.
+> La identidad visual usa una paleta de verde oscuro, verde principal, verdes claros, blanco y grises,
+> centralizada en `frontend/src/index.css` (tokens `--color-brand-*` y `--color-accent-*`) y adaptada
+> a modo claro y oscuro.
 >
 > **Datos de demostración:** solo se cargan en el perfil `dev` y son ficticios.
 

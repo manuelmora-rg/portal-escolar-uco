@@ -51,7 +51,7 @@ export default function Institution() {
           <div className="grid gap-6 md:grid-cols-2">
             <article className="card">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
+                <span className="grid size-10 place-items-center rounded-xl bg-brand-100 text-brand-800 dark:bg-brand-900/60 dark:text-brand-100">
                   <Flag size={20} />
                 </span>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Misión</h2>
@@ -62,7 +62,7 @@ export default function Institution() {
             </article>
             <article className="card">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-200">
+                <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
                   <Compass size={20} />
                 </span>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Visión</h2>

@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <div>
       <section className="relative overflow-hidden bg-brand-950 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.28),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.18),transparent_40%)]" />
+        <div className="hero-glow absolute inset-0" />
         <div className="container-page relative grid gap-12 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:py-28">
           <div>
             <span className="badge bg-white/10 text-accent-300 ring-1 ring-white/15">

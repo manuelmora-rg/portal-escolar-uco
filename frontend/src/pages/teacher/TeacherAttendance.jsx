@@ -122,7 +122,7 @@ export default function TeacherAttendance() {
       </div>
 
       {message ? (
-        <p className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+        <p className="mb-4 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700 dark:border-brand-800 dark:bg-brand-900/40 dark:text-brand-100">
           {message}
         </p>
       ) : null}
